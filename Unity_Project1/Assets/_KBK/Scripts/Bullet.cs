@@ -23,8 +23,8 @@ public class Bullet : MonoBehaviour
     }
 
     //카메라 화면밖으로 나가서 보이지 않게 되면 호출되는 이벤트 함수
-    private void OnBecameInvisible()
-    {
-        Destroy(gameObject);
-    }
+    //private void OnBecameInvisible()
+    //{
+    //    Destroy(gameObject);
+    //}
 }
