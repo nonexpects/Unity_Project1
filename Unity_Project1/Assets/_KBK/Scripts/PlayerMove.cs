@@ -9,6 +9,9 @@ public class PlayerMove : MonoBehaviour
 
     public Vector2 margin; // 뷰포트 좌표는 0f ~ 1f 사이의 값
 
+    //조이스틱 사용하기
+    public VariableJoystick joystick; //조이스틱 사용
+
     void Start()
     {
         margin = new Vector2(0.08f, 0.05f);
@@ -23,9 +26,16 @@ public class PlayerMove : MonoBehaviour
     //플레이어 이동 
     private void Move()
     {
-        
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
+
+        //조이스틱 사용 - 이동
+        //키보드가 안눌렸을 때 => 조이스틱 사용하면 된다.
+        if(h==0 && v==0)
+        {
+            h = joystick.Horizontal;
+            v = joystick.Vertical;
+        }
         
         
         //======================= 이 동 방 법 들 ============================//]
