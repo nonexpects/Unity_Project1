@@ -10,10 +10,6 @@ public class Enemy : MonoBehaviour
     
     public float speed = 4f;
     
-    void Start()
-    {
-    }
-    
     void Update()
     {
         transform.Translate(Vector3.down * speed * Time.deltaTime);
@@ -21,6 +17,7 @@ public class Enemy : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        
         //자기자신도 없애고 충돌한 오브젝트도 없앤다.
         //Destroy(gameObject, 1f); // 2번째 인자는 duration
         Destroy(gameObject);
@@ -30,8 +27,8 @@ public class Enemy : MonoBehaviour
             collision.gameObject.SetActive(false);
         }
         GameManager.instance.AddScore();
+        GameManager.instance.PlayExpBGM();
         ShowEffect();
-        
     }
 
     private void ShowEffect()

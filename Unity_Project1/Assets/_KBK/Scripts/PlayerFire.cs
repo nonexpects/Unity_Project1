@@ -16,6 +16,7 @@ public class PlayerFire : MonoBehaviour
 
     //사운드 재생
     private AudioSource audio;
+    public AudioClip[] soundFx;
 
     //오브젝트 풀링에 사용할 최대 총알 갯수(사이즈)
     int poolSize = 20;
@@ -76,7 +77,7 @@ public class PlayerFire : MonoBehaviour
     void Update()
     {
         //Fire();
-        FireRay();
+        //FireRay();
     }
 
     //일정시간이 지나면 사라져야함
@@ -85,10 +86,6 @@ public class PlayerFire : MonoBehaviour
         //마우스 왼쪽 버튼 or 왼쪽 컨트롤
         if (Input.GetButtonDown("Fire1") && lr.enabled == false)
         {
-            //사운드 재생 
-            audio.Play();
-
-            
             if (Physics.Raycast(transform.position, Vector3.up, out hit, 10f, ~(1 << 9)))
             {
 
@@ -115,7 +112,7 @@ public class PlayerFire : MonoBehaviour
     public void Fire()
     {
         //마우스 왼쪽 버튼 or 왼쪽 컨트롤
-        if(Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1"))
         {
             // 총알 게임 오브젝트 생성
             GameObject bullet = Instantiate(bulletFactory);
@@ -129,6 +126,9 @@ public class PlayerFire : MonoBehaviour
     //레이저버튼 클릭시 
     public void OnLaserButtonClick()
     {
+        //사운드 재생 
+        audio.PlayOneShot(soundFx[1]);
+
         if (Physics.Raycast(transform.position, Vector3.up, out hit, 10f, ~(1 << 9)))
         {
             //라인렌더러 컴포넌트 활성화
@@ -150,6 +150,9 @@ public class PlayerFire : MonoBehaviour
     //파이어버튼 클릭시 
     public void OnFireButtonClick()
     {
+
+        //사운드 재생 
+        audio.PlayOneShot(soundFx[0]);
         //1. 배열 오브젝트풀링으로 총알발사
         //bulletPool[fireIndex].SetActive(true);
         //bulletPool[fireIndex].transform.position = firePoint.transform.position;
@@ -179,7 +182,7 @@ public class PlayerFire : MonoBehaviour
         //}
 
         //4. 큐 오브젝트에서 풀링
-        if(bulletPool.Count>0)
+        if (bulletPool.Count>0)
         {
             GameObject bullet = bulletPool.Dequeue();
             bullet.SetActive(true);

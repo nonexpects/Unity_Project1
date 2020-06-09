@@ -18,6 +18,9 @@ public class GameManager : MonoBehaviour
 
     public GameObject player;
 
+    AudioSource audio;
+    public AudioClip expfx;
+
     private void Awake()
     {
         if (!instance)
@@ -27,15 +30,16 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        highScoreText.text = "HIGHSCORE : " + highscore.ToString();
-        scoreText.text = "SCORE : " + score;
-        
+        highScoreText.text = "HIGHSCORE : " + highscore.ToString("000000");
+        scoreText.text = "SCORE : " + score.ToString("000000");
+        audio = GetComponent<AudioSource>();
+
     }
 
     public void AddScore(int num = 1)
     {
         score += num;
-        scoreText.text = "SCORE : " + score;
+        scoreText.text = "SCORE : " + score.ToString("000000");
     }
 
     // Update is called once per frame
@@ -44,13 +48,19 @@ public class GameManager : MonoBehaviour
         if (score >= highscore)
         {
             highscore = score;
-            highScoreText.text = "HIGHSCORE : " + highscore.ToString();
+            highScoreText.text = "HIGHSCORE : " + highscore.ToString("000000");
         }
     }
 
     private void OnDisable()
     {
         PlayerPrefs.SetInt(keyString, highscore);
+    }
+
+    public void PlayExpBGM()
+    {
+        audio.clip = expfx;
+        audio.PlayOneShot(expfx);
     }
 
 }
