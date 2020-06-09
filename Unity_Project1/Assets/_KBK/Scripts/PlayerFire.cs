@@ -14,31 +14,39 @@ public class PlayerFire : MonoBehaviour
     float currTime;
     float rayMaxTime = 1f;
 
+    //사운드 재생
+    private AudioSource audio;
+
     void Start()
     {
         //라인 렌더러 컴포넌트 추가
         lr = GetComponent<LineRenderer>();
-        lr.startWidth = 0.5f;
+        lr.startWidth = 0.2f;
         //중요 !!!
         //게임 오브젝트는 활성화 비활성화 => SetActive() 함수 사용
         //컴포넌트는 enabled 속성 사용
+
+        audio = GetComponent<AudioSource>();
     }
 
     void Update()
     {
         //Fire();
-        //FireRay();
+        FireRay();
     }
 
     //일정시간이 지나면 사라져야함
     public void FireRay()
     {
-        
         //마우스 왼쪽 버튼 or 왼쪽 컨트롤
         if (Input.GetButtonDown("Fire1") && lr.enabled == false)
         {
+            //사운드 재생 
+            audio.Play();
+
             if (Physics.Raycast(transform.position, Vector3.up, out hit, 10f, ~(1 << 9)))
             {
+
                 //라인렌더러 컴포넌트 활성화
                 lr.enabled = true;
                 //라인 시작점, 끝점
@@ -46,15 +54,17 @@ public class PlayerFire : MonoBehaviour
                 lr.SetPosition(1, hit.point); //시작점Idx : 0
             }
 
-            if (lr.enabled) currTime += Time.deltaTime;
-
-            if (currTime > rayMaxTime)
-            {
-                lr.enabled = false;
-                currTime = 0;
-            }
         }
-        
+
+
+        if (lr.enabled) currTime += Time.deltaTime;
+
+        if (currTime > rayMaxTime)
+        {
+            lr.enabled = false;
+            currTime = 0;
+        }
+
     }
 
     public void Fire()

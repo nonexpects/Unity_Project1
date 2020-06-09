@@ -75,6 +75,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2a0105b70e254e4e9ef067700fd1191, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fxFactory: {fileID: 100006, guid: 700cbc4540621c84b853efa2ab0dd669, type: 3}
   speed: 4
 --- !u!1001 &905230961379185925
 PrefabInstance:
