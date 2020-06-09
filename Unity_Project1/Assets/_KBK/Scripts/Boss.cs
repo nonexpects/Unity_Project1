@@ -26,8 +26,8 @@ public class Boss : MonoBehaviour
     
     void Update()
     {
-        AutoFire1();
-        AutoFire2();
+        //AutoFire1();
+        //AutoFire2();
     }
     //플레이어 향해서 총알 발사
     private void AutoFire1()

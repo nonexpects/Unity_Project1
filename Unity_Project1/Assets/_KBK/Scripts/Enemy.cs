@@ -24,9 +24,10 @@ public class Enemy : MonoBehaviour
         //자기자신도 없애고 충돌한 오브젝트도 없앤다.
         //Destroy(gameObject, 1f); // 2번째 인자는 duration
         Destroy(gameObject);
-        if(collision.gameObject.name != "Player")
+        if(collision.gameObject.name == "Bullet")
         {
-            Destroy(collision.gameObject);
+            //Destroy(collision.gameObject);
+            collision.gameObject.SetActive(false);
         }
         GameManager.instance.AddScore();
         ShowEffect();
