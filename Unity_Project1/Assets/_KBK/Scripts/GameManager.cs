@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     AudioSource audio;
     public AudioClip expfx;
 
+
+
     private void Awake()
     {
         if (!instance)
@@ -30,7 +32,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        highScoreText.text = "HIGHSCORE : " + highscore.ToString("000000");
+        highScoreText.text = "HIGHEST : " + highscore.ToString("000000");
         scoreText.text = "SCORE : " + score.ToString("000000");
         audio = GetComponent<AudioSource>();
 

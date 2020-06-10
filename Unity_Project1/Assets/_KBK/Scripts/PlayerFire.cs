@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerFire : MonoBehaviour
 {
@@ -12,11 +12,13 @@ public class PlayerFire : MonoBehaviour
     public GameObject firePoint;        //총알 발사 위치
     RaycastHit hit;
     float currTime;
-    float rayMaxTime = 1f;
+    float rayMaxTime = 2f;
 
     //사운드 재생
     private AudioSource audio;
     public AudioClip[] soundFx;
+
+    Boss boss;
 
     //오브젝트 풀링에 사용할 최대 총알 갯수(사이즈)
     int poolSize = 20;
@@ -28,12 +30,28 @@ public class PlayerFire : MonoBehaviour
     //public List<GameObject> bulletPool;
     //3. 큐
     public Queue<GameObject> bulletPool;
+    
+    public Image laserImage;
+    Button laserBtn;
+    bool laserOn = true;
+
+    GameObject laserHitFx;
+
+    GameObject poolParent;
+
+    private void Awake()
+    {
+        poolParent = new GameObject("PlayerBullets");
+    }
 
     void Start()
     {
         //라인 렌더러 컴포넌트 추가
         lr = GetComponent<LineRenderer>();
-        lr.startWidth = 0.2f;
+        lr.startWidth = 0.4f;
+        lr.enabled = false;
+        lr.SetColors(Color.red, Color.yellow);
+        
         //중요 !!!
         //게임 오브젝트는 활성화 비활성화 => SetActive() 함수 사용
         //컴포넌트는 enabled 속성 사용
@@ -42,6 +60,11 @@ public class PlayerFire : MonoBehaviour
 
         //오브젝트 풀링 초기화
         InitObjectPooling();
+
+        laserBtn = laserImage.GetComponent<Button>();
+
+        laserHitFx = Resources.Load("FX/" + "LaserExplosion") as GameObject;
+        boss = GameObject.Find("Boss").GetComponent<Boss>();
     }
     //오브젝트 풀링 초기화
     private void InitObjectPooling()
@@ -69,6 +92,7 @@ public class PlayerFire : MonoBehaviour
         for (int i = 0; i < poolSize; i++)
         {
             GameObject bullet = Instantiate(bulletFactory);
+            bullet.transform.parent = poolParent.transform;
             bullet.SetActive(false);
             bulletPool.Enqueue(bullet);
         }
@@ -78,6 +102,32 @@ public class PlayerFire : MonoBehaviour
     {
         //Fire();
         //FireRay();
+
+        if (lr.enabled)
+        {
+            //라인 시작점, 끝점
+            lr.SetPosition(0, transform.position); //시작점Idx : 0
+            currTime += Time.deltaTime;
+            GameObject hitFx = Instantiate(laserHitFx);
+            hitFx.transform.position = hit.point;
+            Destroy(hitFx, 1f);
+        }
+
+        if (currTime > rayMaxTime)
+        {
+            lr.enabled = false;
+            currTime = 0;
+            
+        }
+
+        if (laserOn)
+        {
+            laserBtn.interactable = true;
+        }
+        else
+        {
+            laserBtn.interactable = false;
+        }
     }
 
     //일정시간이 지나면 사라져야함
@@ -88,25 +138,13 @@ public class PlayerFire : MonoBehaviour
         {
             if (Physics.Raycast(transform.position, Vector3.up, out hit, 10f, ~(1 << 9)))
             {
-
                 //라인렌더러 컴포넌트 활성화
                 lr.enabled = true;
-                //라인 시작점, 끝점
-                lr.SetPosition(0, transform.position); //시작점Idx : 0
                 lr.SetPosition(1, hit.point); //시작점Idx : 0
+                
             }
 
         }
-
-
-        if (lr.enabled) currTime += Time.deltaTime;
-
-        if (currTime > rayMaxTime)
-        {
-            lr.enabled = false;
-            currTime = 0;
-        }
-
     }
 
     public void Fire()
@@ -126,25 +164,33 @@ public class PlayerFire : MonoBehaviour
     //레이저버튼 클릭시 
     public void OnLaserButtonClick()
     {
-        //사운드 재생 
-        audio.PlayOneShot(soundFx[1]);
-
         if (Physics.Raycast(transform.position, Vector3.up, out hit, 10f, ~(1 << 9)))
         {
+            //사운드 재생 
+            audio.PlayOneShot(soundFx[1]);
+
             //라인렌더러 컴포넌트 활성화
             lr.enabled = true;
             //라인 시작점, 끝점
-            lr.SetPosition(0, transform.position); //시작점Idx : 0
+            //lr.SetPosition(0, transform.position); //시작점Idx : 0
             lr.SetPosition(1, hit.point); //시작점Idx : 0
+
+            laserOn = false;
+            laserImage.fillAmount = 0f;
+
+            if (hit.collider.tag == "ENEMY")
+            {
+                hit.collider.GetComponent<Enemy>().EnemyDead();
+            }
+            else if(hit.collider.name == "Boss")
+            {
+                boss.BossHpLoss();
+            }
+            StartCoroutine(LaserCharge());
+            
         }
 
-        if (lr.enabled) currTime += Time.deltaTime;
 
-        if (currTime > rayMaxTime)
-        {
-            lr.enabled = false;
-            currTime = 0;
-        }
     }
 
     //파이어버튼 클릭시 
@@ -202,5 +248,16 @@ public class PlayerFire : MonoBehaviour
         //GameObject bullet = Instantiate(bulletFactory);
         //총알 오브젝트 위치 지정
         //bullet.transform.position = firePoint.transform.position; // PlayerFire 스크립트가 붙어있는 오브젝트의 transform위치
+    }
+
+    IEnumerator LaserCharge()
+    {
+        while(!laserOn)
+        {
+            laserImage.fillAmount += 0.05f;
+            if (laserImage.fillAmount >= 1f)
+                laserOn = true;
+            yield return new WaitForSeconds(0.5f);
+        }
     }
 }

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4044885543398629351}
   m_Layer: 11
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: ENEMY
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -77,7 +77,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fxFactory: {fileID: 100004, guid: cad3c743039e9ce4e893c144f1db6813, type: 3}
-  clip: {fileID: 8300000, guid: bdcf038e12dfba2458bfbbcb205b8468, type: 3}
   speed: 4
 --- !u!82 &4044885543398629351
 AudioSource:

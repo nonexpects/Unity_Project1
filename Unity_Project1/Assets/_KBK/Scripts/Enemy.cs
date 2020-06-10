@@ -6,10 +6,15 @@ public class Enemy : MonoBehaviour
 {
     //위에서 밑으로 떨어지게 한다(똥피하기 느낌)
     // 충돌처리 (에너미랑 플레이어, 에너미랑 플레이어 총알)
-    public GameObject fxFactory;
+    GameObject fxFactory;
     
     public float speed = 4f;
-    
+
+    private void Start()
+    {
+        fxFactory = Resources.Load("FX/" + "ExplosionFireball") as GameObject;
+    }
+
     void Update()
     {
         transform.Translate(Vector3.down * speed * Time.deltaTime);
@@ -20,21 +25,22 @@ public class Enemy : MonoBehaviour
         
         //자기자신도 없애고 충돌한 오브젝트도 없앤다.
         //Destroy(gameObject, 1f); // 2번째 인자는 duration
-        Destroy(gameObject);
-        if(collision.gameObject.name == "Bullet")
+        
+        if(collision.gameObject.name.Contains("Bullet"))
         {
             //Destroy(collision.gameObject);
             collision.gameObject.SetActive(false);
         }
-        GameManager.instance.AddScore();
-        GameManager.instance.PlayExpBGM();
-        ShowEffect();
+        EnemyDead();
     }
 
-    private void ShowEffect()
+    public void EnemyDead()
     {
+        GameManager.instance.AddScore();
+        GameManager.instance.PlayExpBGM();
         GameObject fx = Instantiate(fxFactory);
         fx.transform.position = transform.position;
-        Destroy(fx, 1.5f);
+        Destroy(fx, 1f);
+        Destroy(gameObject);
     }
 }
