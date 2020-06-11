@@ -6,8 +6,14 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
+    Light damageLight;
+
     float currHp;
     float maxHp = 10f;
+
+    public bool invincible;
+    private float currInvincibleTime;
+
     public float HP
     {
         get { return currHp; }
@@ -27,6 +33,13 @@ public class Player : MonoBehaviour
         HP = maxHp;
         currColor = Color.green;
         hpBarImage.color = currColor;
+
+        damageLight = gameObject.transform.Find("Player Body").transform.Find("DamageLight").GetComponent<Light>();
+
+        damageLight.intensity = 5;
+        damageLight.enabled = false;
+
+        invincible = false;
     }
     
     void Update()
@@ -34,6 +47,17 @@ public class Player : MonoBehaviour
         hpBarImage.fillAmount = (float)HP / maxHp;
 
         HpBarColor();
+
+        if(invincible)
+        {
+            currInvincibleTime += Time.deltaTime;
+            if(currInvincibleTime > 1f)
+            {
+                invincible = false;
+                damageLight.enabled = false;
+                currInvincibleTime = 0f;
+            }
+        }
     }
 
     private void HpBarColor()
@@ -57,9 +81,41 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "ENEMY" || collision.gameObject.tag == "BOSS")
+
+        if (collision.gameObject.layer == LayerMask.NameToLayer("E_Bullet"))
         {
+            //총알 오브젝트는 비활성시킨다
+            collision.gameObject.SetActive(false);
+            collision.gameObject.transform.eulerAngles = Vector3.zero;
+            //오브젝트 풀에 추가만 해준다
+            Boss bs = GameObject.Find("Boss").GetComponent<Boss>();
+            bs.bossBulletPool.Enqueue(collision.gameObject);
+
+            PlayerDamaged();
+        }
+
+        
+    }
+    
+    public void PlayerDamaged()
+    {
+        if (!invincible)
+        {
+            invincible = true;
+            StartCoroutine(Flicker());
             HP -= 1f;
+        }
+        
+        currInvincibleTime = 0f;
+    }
+
+    IEnumerator Flicker()
+    {
+        while (invincible)
+        {
+            if (!damageLight.enabled) damageLight.enabled = true;
+            else damageLight.enabled = false;
+            yield return new WaitForSeconds(0.1f);
         }
     }
 }

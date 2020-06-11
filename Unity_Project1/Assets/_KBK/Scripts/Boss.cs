@@ -14,9 +14,7 @@ public class Boss : MonoBehaviour
     GameObject target;
     public GameObject bulletFactory;    //에너미 총알은 따로 만드는게 맞음(충돌처리때문)
     public float fireTime = 1f;              //1초에 한번씩 발사
-    float currTime = 0f;
     public float fireTime1 = 1.5f;
-    float currTime1 = 0f;
     public int bulletMax = 10;
 
     bool BossAppear = false;
@@ -53,7 +51,7 @@ public class Boss : MonoBehaviour
         bossHpUI.SetActive(false);
 
         bossBulletPool = new Queue<GameObject>();
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 30; i++)
         {
             GameObject bullet = Instantiate(bulletFactory);
             bullet.transform.parent = poolParent.transform;
@@ -95,14 +93,16 @@ public class Boss : MonoBehaviour
                 //총구의 방향도 맞춰준다(이게 중요) -> 총알이 Up으로 되어있으니 이걸 바꿔줘야함
                 bullet.transform.up = -dir;
             }
-            //else
-            //{
-            //    //총알 오브젝트 생성
-            //    GameObject bullet = Instantiate(bulletFactory);
-            //    bullet.SetActive(false);
-            //    //생성된 총알 오브젝트를 풀에 넣는다
-            //    bossBulletPool.Enqueue(bullet);
-            //}
+            else
+            {
+                //총알 오브젝트 생성
+                GameObject bullet = Instantiate(bulletFactory);
+                bullet.transform.parent = poolParent.transform;
+                bullet.SetActive(false);
+                //생성된 총알 오브젝트를 풀에 넣는다
+                bossBulletPool.Enqueue(bullet);
+            }
+
             yield return wfs1;
         }
     }
@@ -114,13 +114,13 @@ public class Boss : MonoBehaviour
             for (int i = 0; i < bulletMax; i++)
             {
                 GameObject bullet = bossBulletPool.Dequeue();
+                bullet.SetActive(true);
                 bullet.transform.position = transform.position;
                 //360도 방향으로 총알 발사
                 float angle = 360f / bulletMax;
                 //총구 방향 정해줌
                 bullet.transform.eulerAngles = new Vector3(0, 0, i * angle);
             }
-
             yield return wfs2;
         }
                
@@ -136,8 +136,6 @@ public class Boss : MonoBehaviour
             
             yield return wfs;
         }
-
-        
     }
 
     public void BossHpLoss()

@@ -239,6 +239,7 @@ public class PlayerFire : MonoBehaviour
         {
             //총알 오브젝트 생성
             GameObject bullet = Instantiate(bulletFactory);
+            bullet.transform.parent = poolParent.transform;
             bullet.SetActive(false);
             //생성된 총알 오브젝트를 풀에 넣는다
             bulletPool.Enqueue(bullet);

@@ -7,12 +7,14 @@ public class Enemy : MonoBehaviour
     //위에서 밑으로 떨어지게 한다(똥피하기 느낌)
     // 충돌처리 (에너미랑 플레이어, 에너미랑 플레이어 총알)
     GameObject fxFactory;
-    
+    GameObject player;
+
     public float speed = 4f;
 
     private void Start()
     {
         fxFactory = Resources.Load("FX/" + "ExplosionFireball") as GameObject;
+        player = GameObject.Find("Player");
     }
 
     void Update()
@@ -31,6 +33,13 @@ public class Enemy : MonoBehaviour
             //Destroy(collision.gameObject);
             collision.gameObject.SetActive(false);
         }
+        
+
+        if(collision.gameObject == player)
+        {
+            player.GetComponent<Player>().PlayerDamaged();
+        }
+
         EnemyDead();
     }
 
