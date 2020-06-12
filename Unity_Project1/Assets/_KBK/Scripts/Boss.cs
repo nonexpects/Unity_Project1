@@ -33,6 +33,7 @@ public class Boss : MonoBehaviour
 
     public Queue<GameObject> bossBulletPool;
     GameObject poolParent;
+    GameObject fxFactory;
 
     //보스 클리어 화면
     GameObject bossClear;
@@ -40,7 +41,7 @@ public class Boss : MonoBehaviour
     private void Awake()
     {
         poolParent = new GameObject("BossBullets");
-
+        fxFactory = Resources.Load("FX/" + "ExplosionFireball") as GameObject;
     }
 
     void Start()
@@ -155,7 +156,9 @@ public class Boss : MonoBehaviour
     {
         if (!BossAppear) return;
         currHp-= lossHp;
-
+        GameObject fx = Instantiate(fxFactory);
+        fx.transform.position = transform.position;
+        Destroy(fx, 1f);
         bossHPBar.fillAmount = (float)currHp / maxHp;
     }
 
