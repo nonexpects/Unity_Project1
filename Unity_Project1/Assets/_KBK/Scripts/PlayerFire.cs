@@ -12,7 +12,7 @@ public class PlayerFire : MonoBehaviour
     public GameObject firePoint;        //총알 발사 위치
     RaycastHit hit;
     float currTime;
-    float rayMaxTime = 2f;
+    float rayMaxTime = 1f;
 
     //사운드 재생
     private AudioSource audio;
@@ -166,31 +166,36 @@ public class PlayerFire : MonoBehaviour
     {
         if (Physics.Raycast(transform.position, Vector3.up, out hit, 10f, ~(1 << 9)))
         {
-            //사운드 재생 
-            audio.PlayOneShot(soundFx[1]);
-
-            //라인렌더러 컴포넌트 활성화
-            lr.enabled = true;
-            //라인 시작점, 끝점
-            //lr.SetPosition(0, transform.position); //시작점Idx : 0
-            lr.SetPosition(1, hit.point); //시작점Idx : 0
-
-            laserOn = false;
-            laserImage.fillAmount = 0f;
-
-            if (hit.collider.tag == "ENEMY")
+            if (hit.collider.gameObject.layer != LayerMask.NameToLayer("E_Bullet"))
             {
-                hit.collider.GetComponent<Enemy>().EnemyDead();
+
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Boss"))
+                {
+                    GameObject.Find("Boss").GetComponent<Boss>().BossHpLoss(5);
+                }
+                //사운드 재생 
+                audio.PlayOneShot(soundFx[1]);
+
+                //라인렌더러 컴포넌트 활성화
+                lr.enabled = true;
+                //라인 시작점, 끝점
+                //lr.SetPosition(0, transform.position); //시작점Idx : 0
+                lr.SetPosition(1, hit.point); //시작점Idx : 0
+
+                laserOn = false;
+                laserImage.fillAmount = 0f;
+
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+                {
+                    hit.collider.GetComponent<Enemy>().EnemyDead();
+                }
+                else if (hit.collider.name == "Boss")
+                {
+                    boss.BossHpLoss();
+                }
+                StartCoroutine(LaserCharge());
             }
-            else if(hit.collider.name == "Boss")
-            {
-                boss.BossHpLoss();
-            }
-            StartCoroutine(LaserCharge());
-            
         }
-
-
     }
 
     //파이어버튼 클릭시 

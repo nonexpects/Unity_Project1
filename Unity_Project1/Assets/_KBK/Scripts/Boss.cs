@@ -34,9 +34,13 @@ public class Boss : MonoBehaviour
     public Queue<GameObject> bossBulletPool;
     GameObject poolParent;
 
+    //보스 클리어 화면
+    GameObject bossClear;
+
     private void Awake()
     {
         poolParent = new GameObject("BossBullets");
+
     }
 
     void Start()
@@ -58,6 +62,9 @@ public class Boss : MonoBehaviour
             bullet.SetActive(false);
             bossBulletPool.Enqueue(bullet);
         }
+
+        bossClear = GameObject.Find("BossClear");
+        bossClear.SetActive(false);
     }
     
     void Update()
@@ -74,6 +81,12 @@ public class Boss : MonoBehaviour
             bossHpUI.SetActive(true);
             StartCoroutine(AutoFire1());
             StartCoroutine(AutoFire2());
+        }
+
+        if (currHp <= 0f && BossAppear)
+        {
+            Time.timeScale = 0f;
+            bossClear.SetActive(true);
         }
     }
     //플레이어 향해서 총알 발사
@@ -138,10 +151,10 @@ public class Boss : MonoBehaviour
         }
     }
 
-    public void BossHpLoss()
+    public void BossHpLoss(int lossHp = 1)
     {
         if (!BossAppear) return;
-        currHp--;
+        currHp-= lossHp;
 
         bossHPBar.fillAmount = (float)currHp / maxHp;
     }
@@ -151,6 +164,9 @@ public class Boss : MonoBehaviour
         if (collision.gameObject.name.Contains("Bullet"))
         {
             collision.gameObject.SetActive(false);
+            //오브젝트 풀에 추가만 해준다
+            PlayerFire pf = GameObject.Find("Player").GetComponent<PlayerFire>();
+            pf.bulletPool.Enqueue(collision.gameObject);
             BossHpLoss();
         }
     }

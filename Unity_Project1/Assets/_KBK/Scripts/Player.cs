@@ -23,10 +23,13 @@ public class Player : MonoBehaviour
         }
     }
     
-
     private Color currColor;
 
     public Image hpBarImage;
+
+    GameObject gameOver;
+
+    public GameObject hitFx;
 
     void Start()
     {
@@ -40,6 +43,8 @@ public class Player : MonoBehaviour
         damageLight.enabled = false;
 
         invincible = false;
+        gameOver = GameObject.Find("GameOver");
+        gameOver.SetActive(false);
     }
     
     void Update()
@@ -57,6 +62,13 @@ public class Player : MonoBehaviour
                 damageLight.enabled = false;
                 currInvincibleTime = 0f;
             }
+        }
+
+        if(HP <= 0f)
+        {
+            HP = 0f;
+            Time.timeScale = 0f;
+            gameOver.SetActive(true);
         }
     }
 
@@ -91,13 +103,13 @@ public class Player : MonoBehaviour
             Boss bs = GameObject.Find("Boss").GetComponent<Boss>();
             bs.bossBulletPool.Enqueue(collision.gameObject);
 
-            PlayerDamaged();
+            PlayerDamaged(collision);
         }
 
         
     }
     
-    public void PlayerDamaged()
+    public void PlayerDamaged(Collision coll)
     {
         if (!invincible)
         {
@@ -105,7 +117,9 @@ public class Player : MonoBehaviour
             StartCoroutine(Flicker());
             HP -= 1f;
         }
-        
+        GameObject fx = Instantiate(hitFx);
+        fx.transform.position = coll.transform.position;
+        Destroy(fx, 1f);
         currInvincibleTime = 0f;
     }
 

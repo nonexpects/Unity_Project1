@@ -37,7 +37,7 @@ public class Enemy : MonoBehaviour
 
         if(collision.gameObject == player)
         {
-            player.GetComponent<Player>().PlayerDamaged();
+            player.GetComponent<Player>().PlayerDamaged(collision);
         }
 
         EnemyDead();
