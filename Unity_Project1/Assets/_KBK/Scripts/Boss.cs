@@ -28,6 +28,12 @@ public class Boss : MonoBehaviour
 
     Vector3 spawnPoint = new Vector3(0, 2.6f, 0);
 
+    private float currTime;
+
+    //생명 게이지의 처음 색상(녹색)
+    private readonly Color initColor = new Vector4(0, 1.0f, 0f, 1f);
+    private Color currColor;
+
     public GameObject bossHpUI;
     Image bossHPBar;
 
@@ -55,6 +61,9 @@ public class Boss : MonoBehaviour
         bossHPBar = bossHpUI.GetComponentInChildren<Image>();
         bossHpUI.SetActive(false);
 
+        currColor = initColor;
+        bossHPBar.color = currColor;
+
         bossBulletPool = new Queue<GameObject>();
         for (int i = 0; i < 30; i++)
         {
@@ -66,11 +75,14 @@ public class Boss : MonoBehaviour
 
         bossClear = GameObject.Find("BossClear");
         bossClear.SetActive(false);
+
+        
     }
     
     void Update()
     {
-        if(Time.time > 10f)
+        currTime += Time.deltaTime;
+        if(currTime > 10f && !BossAppear)
         {
             StartCoroutine(BossAppearance());
         }
@@ -159,8 +171,24 @@ public class Boss : MonoBehaviour
         GameObject fx = Instantiate(fxFactory);
         fx.transform.position = transform.position;
         Destroy(fx, 1f);
-        bossHPBar.fillAmount = (float)currHp / maxHp;
+        HpBarColor();
     }
+
+    private void HpBarColor()
+    {
+        if ((currHp / maxHp) > 0.5f)
+        {
+            currColor.r = (1 - (currHp / maxHp)) * 2f;
+        }
+        else // 생명수치가 0%일 때는 노란색에서 빨간색으로 변경
+            currColor.g = (currHp / maxHp) * 2f;
+
+        //HPBar 색상 변경
+        bossHPBar.color = currColor;
+        //HPBar 크기 변경
+        bossHPBar.fillAmount = (currHp / maxHp);
+    }
+
 
     private void OnCollisionEnter(Collision collision)
     {

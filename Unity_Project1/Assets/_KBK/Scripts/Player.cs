@@ -22,7 +22,9 @@ public class Player : MonoBehaviour
             currHp = value;
         }
     }
-    
+
+    //생명 게이지의 처음 색상(녹색)
+    private readonly Color initColor = new Vector4(0, 1.0f, 0f, 1f);
     private Color currColor;
 
     public Image hpBarImage;
@@ -30,18 +32,18 @@ public class Player : MonoBehaviour
     GameObject gameOver;
 
     public GameObject hitFx;
-
+    
     void Start()
     {
         HP = maxHp;
-        currColor = Color.green;
+        currColor = initColor;
         hpBarImage.color = currColor;
 
         damageLight = gameObject.transform.Find("Player Body").transform.Find("DamageLight").GetComponent<Light>();
 
         damageLight.intensity = 5;
         damageLight.enabled = false;
-
+        
         invincible = false;
         gameOver = GameObject.Find("GameOver");
         gameOver.SetActive(false);
@@ -74,21 +76,17 @@ public class Player : MonoBehaviour
 
     private void HpBarColor()
     {
-        if (hpBarImage.fillAmount <= .6f && hpBarImage.fillAmount >= .3f)
+        if ((currHp / maxHp) > 0.5f)
         {
-            currColor = Color.yellow;
-            hpBarImage.color = currColor;
+            currColor.r = (1 - (currHp / maxHp)) * 2f;
         }
-        else if(hpBarImage.fillAmount < .3f)
-        {
-            currColor = Color.red;
-            hpBarImage.color = currColor;
-        }
-        else
-        {
-            currColor = Color.green;
-            hpBarImage.color = currColor;
-        }
+        else // 생명수치가 0%일 때는 노란색에서 빨간색으로 변경
+            currColor.g = (currHp / maxHp) * 2f;
+
+        //HPBar 색상 변경
+        hpBarImage.color = currColor;
+        //HPBar 크기 변경
+        hpBarImage.fillAmount = (currHp / maxHp);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -120,7 +118,7 @@ public class Player : MonoBehaviour
         GameObject fx = Instantiate(hitFx);
         fx.transform.position = coll.transform.position;
         Destroy(fx, 1f);
-        currInvincibleTime = 0f;
+        //currInvincibleTime = 0f;
     }
 
     IEnumerator Flicker()
